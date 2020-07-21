@@ -1,0 +1,9 @@
+name: "Python Merge Schedule"
+description: "A python-based GitHub action to merge pull request at a scheduled time."
+author: "Rongxin Liu"
+branding:
+    icon: "git-merge"
+    color: "red"
+runs:
+    using: "docker"
+    image: "Dockerfile"
