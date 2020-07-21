@@ -13,6 +13,13 @@ TIMEZONE = os.getenv("TIMEZONE")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_REPOSITORY = os.getenv("GITHUB_REPOSITORY")
 
+def tz_offset():
+    """Calculate timezone offset between user timezone and UTC timezone"""
+    tz_user = parser.parse(str(datetime.now(timezone(TIMEZONE)))[:-6]).timestamp()
+    tz_github = parser.parse(str(datetime.now(timezone("UTC")))[:-6]).timestamp()
+    return int(tz_user - tz_github)
+
+
 def get_schedule(pull):
     """Extract the scheduled time from PR's description"""
     try:
@@ -23,33 +30,23 @@ def get_schedule(pull):
 
 
 def get_scheduled_pulls(repo):
-    """Get all PRs that are scheduled to merge"""
+    """Get all scheduled PRs"""
     scheduled_pulls = []
+    due_scheduled_pulls = []
     pulls = repo.get_pulls(state='open', sort='created', base='master')
     for pull in pulls:
         try:
             if get_schedule(pull) > int(datetime.now().timestamp()):
                 scheduled_pulls.append(pull)
-        except:
-            pass
-
-    logging.info(f"Found {len(scheduled_pulls)} PR(s) scheduled to merge")
-    return scheduled_pulls
-
-
-def get_due_pulls(repo):
-    """Get all PRs that are due for merging"""
-    due_scheduled_pulls = []
-    pulls = repo.get_pulls(state='open', sort='created', base='master')
-    for pull in pulls:
-        try:
-            if get_schedule(pull) <= int(datetime.now().timestamp()):
+            else:
                 due_scheduled_pulls.append(pull)
         except:
             pass
-
+    
+    logging.info(f"Found {len(scheduled_pulls)} PR(s) scheduled to merge")
+    [logging.info(f"PR #{pull.number} is scheduled to merge at {datetime.fromtimestamp(get_schedule(pull)).strftime('%c')}") for pull in scheduled_pulls]
     logging.info(f"Found {len(due_scheduled_pulls)} PR(s) due for merging")
-    return due_scheduled_pulls
+    return (scheduled_pulls, due_scheduled_pulls)
 
 
 def merge(pull):
@@ -63,21 +60,12 @@ def merge(pull):
         traceback.print_exc()
 
 
-def tz_offset():
-    """Calculate timezone offset between user timezone and UTC timezone"""
-    tz_user = parser.parse(str(datetime.now(timezone(TIMEZONE)))[:-6]).timestamp()
-    tz_github = parser.parse(str(datetime.now(timezone("UTC")))[:-6]).timestamp()
-    return int(tz_user - tz_github)
-
-
 if __name__ == "__main__":
     logging.info(f"Action triggered at: {datetime.now()}")
     client = Github(GITHUB_TOKEN)
     repo = client.get_repo(GITHUB_REPOSITORY)    
     try:
-        get_scheduled_pulls(repo)
-        for due_pull in get_due_pulls(repo):
-            merge(due_pull)
+        [merge(due_pull) for due_pull in get_scheduled_pulls(repo)[1]]
     except:
         traceback.print_exc()
     

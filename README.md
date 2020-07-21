@@ -25,6 +25,7 @@ jobs:
       - uses: rongxin-liu/python-merge-schedule@v1.x
         env:
           TIMEZONE: America/New_York
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 Specify a timezone using the [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
