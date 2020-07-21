@@ -25,9 +25,9 @@ jobs:
           TIMEZONE: America/New_York
 ```
 
-Specify a timezone using the (TZ database name)[https://en.wikipedia.org/wiki/List_of_tz_database_time_zones]
+Specify a timezone using the [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 
-In the pull request, add a line using the following syntax to set a PR scheduling time:
+In the pull request, add a line using the following syntax to set a PR merge schedule:
 
 ```
 /schedule Sun 6/21 11:59pm
