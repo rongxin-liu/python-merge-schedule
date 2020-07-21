@@ -2,9 +2,11 @@
 
 > A python-based GitHub action to merge pull requests at a scheduled time
 
+> Inspired by https://github.com/marketplace/actions/merge-schedule
+
 ## Usage
 
-Create `.github/workflows/workflow.yml`
+Create `.github/workflows/main.yml`
 
 ```yml
 name: Python Merge Schedule
