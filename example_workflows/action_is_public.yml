@@ -1,0 +1,17 @@
+name: Python Merge Schedule
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+  schedule:
+    - cron: "1/15 * * * *"
+
+jobs:
+  merge_schedule:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cs50/python-merge-schedule@v1.x
+        env:
+          TIMEZONE: America/New_York
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
